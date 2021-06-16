@@ -1,0 +1,11 @@
+version: '3'
+services:
+  aci:
+    container_name: aci
+    build:
+      context: ./docker/
+      dockerfile: Dockerfile
+    ports:
+      - 8001:80
+    volumes:
+      - .:/app
