@@ -1,18 +1,27 @@
 <?php
 
 
-namespace guillian\afpaconnect\tests;
+namespace Guillian\AfpaConnect\tests;
 
 
-use Guillian\AfpaConnect\Connect;
+use Guillian\AfpaConnect\AfpaConnect;
 use PHPUnit\Framework\TestCase;
 
 class ConnectTest extends TestCase
 {
     public function test()
     {
-        $connect = new Connect();
+        $publicKey = file_get_contents("tests/afpanier.key");
 
-        $connect->tokenHandler();
+        $ac = new AfpaConnect("http://localhost/AfpaConnect/", "afpanier", $publicKey);
+
+        $resp = $ac->post("register", [
+            'username' => "123456789",
+            'password' => "test"
+        ]);
+
+        $resp = json_decode($resp);
+
+        $this->assertEquals("302", $resp->code);
     }
 }

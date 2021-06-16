@@ -9,6 +9,8 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^7.3",
+        "ext-json": "*",
+        "firebase/php-jwt": "^5.3",
         "symfony/cache": "^5.3"
     },
     "require-dev": {
