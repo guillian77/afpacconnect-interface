@@ -1,6 +1,6 @@
 # AfpaConnect Helper Interface
 
-Ce module permet d'intégrer facilement une classe permettant d'intégrer facilement le dialogue avec l'API AfpaConnect.
+Ce module permet d'intégrer facilement une classe permettant le dialogue avec l'API AfpaConnect.
 
 Packagist: [guillian/afpaconnect-interface](https://packagist.org/packages/guillian/afpaconnect-interface).
 ## Installation
