@@ -11,7 +11,8 @@
         "guzzlehttp/guzzle": "^7.3",
         "ext-json": "*",
         "firebase/php-jwt": "^5.3",
-        "symfony/cache": "^5.3"
+        "symfony/cache": "^5.3",
+        "cache/cache": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
