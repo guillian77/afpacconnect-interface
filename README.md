@@ -21,7 +21,7 @@ Ce petit guide va vous expliquer comment intégrer
    *Cette autoloader permet de charger dynamiquement les classes se trouvant dans le dossier **vendor**.*
 
 4. Retoucher le fichier `DEVS/modules/initialize.php` afin d'inclure globalement l'API Helper dans tous les services.
-    1. Au début de la classe, ajouter le **use**:
+    1. Avant le début de la classe, ajouter le **use**:
     ```PHP
    <?php
    require_once "database.php";
