@@ -5,6 +5,7 @@ namespace Guillian\AfpaConnect;
 
 
 use Cache\Adapter\Filesystem\FilesystemCachePool;
+use Exception;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -12,6 +13,10 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Psr\Cache\InvalidArgumentException;
 
+/**
+ * Class AfpaConnect
+ * @package Guillian\AfpaConnect
+ */
 class AfpaConnect
 {
     private Client $client;
@@ -26,7 +31,9 @@ class AfpaConnect
 
     private FilesystemCachePool $cache;
 
-    public function __construct(string $hostname, string $issuer, string $publicKey)
+    private bool $verifyToken = true;
+
+    public function __construct(string $hostname = null, string $issuer = null, string $publicKey = null)
     {
         /**
          * Configure cache system
@@ -43,14 +50,109 @@ class AfpaConnect
         /**
          * Initialize general configuration
          */
+        if (!is_null($hostname)) {
+            $this->setHostname($hostname);
+        }
+
+        if (!is_null($issuer)) {
+            $this->setIssuer($issuer);
+        }
+
+        if (!is_null($publicKey)) {
+            $this->setPublicKey($publicKey);
+        }
+    }
+
+    /**
+     * Configure API hostname.
+     *
+     * @param string $hostname API hostname.
+     *
+     * @return $this
+     */
+    public function setHostname(string $hostname): self
+    {
         $this->hostname = trim($hostname, "/")."/api/";
+
+        return $this;
+    }
+
+    /**
+     * Get API hostname
+     *
+     * @return string|null
+     */
+    public function getHostname(): ?string
+    {
+        return $this->hostname;
+    }
+
+    /**
+     * Configure issuer. Who is sending request to API.
+     *
+     * @param string $issuer
+     *
+     * @return $this
+     */
+    public function setIssuer(string $issuer): self
+    {
         $this->issuer = $issuer;
+
+        return $this;
+    }
+
+    /**
+     * Get the issuer.
+     *
+     * @return string|null
+     */
+    public function getIssuer(): ?string
+    {
+        return $this->issuer;
+    }
+
+    /**
+     * Configure public key used to verify external API authenticity.
+     *
+     * @param string $publicKey External app public key. Delivered by the API owner.
+     *
+     * @return $this
+     */
+    public function setPublicKey(string $publicKey): self
+    {
         $this->publicKey = $publicKey;
 
-        /**
-         * Token handler
-         */
-        $this->tokenHandler();
+        return $this;
+    }
+
+    /**
+     * Get external app public key.
+     *
+     * @return string|null
+     */
+    public function getPublicKey(): ?string
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * Verify needed configuration.
+     *
+     * @throws Exception
+     */
+    private function checkConfiguration()
+    {
+        if (!isset($this->hostname)) {
+            throw new Exception("API hostname is missing. Use setHostname() method.");
+        }
+
+        if (!isset($this->issuer)) {
+            throw new Exception("Issuer is missing. Use setIssuer() method.");
+        }
+
+        if (!isset($this->publicKey)) {
+            throw new Exception("Issuer is missing. Use setIssuer() method.");
+        }
     }
 
     /**
@@ -63,14 +165,31 @@ class AfpaConnect
      */
     private function tokenHandler()
     {
+        // Prevent for infinite loop.
+        // Because this method use post method to get JWT. And POST method also call this method itself.
+        if (!$this->verifyToken) {
+            return;
+        }
+
+        $this->checkConfiguration();
+
         $cachedJWT = $this->cache->getItem('jwt');
 
         if (!$cachedJWT->isHit()) { // Check JWT presence.
+            $this->verifyToken = false;
+
             $this->cacheJsonWebToken($cachedJWT);
+
+            $this->verifyToken = true;
         }
 
         if ($this->isTokenExpired($cachedJWT->get())) { // Check JWT expired.
+            $this->verifyToken = false;
+
             $this->cacheJsonWebToken($cachedJWT);
+
+            $this->verifyToken = true;
+
         }
 
         // Save JWT
@@ -115,7 +234,7 @@ class AfpaConnect
     {
         try {
             $this->decodeJWT($jwt);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return true;
         }
 
@@ -147,9 +266,12 @@ class AfpaConnect
      * @return string
      *
      * @throws GuzzleException
+     * @throws InvalidArgumentException
      */
     public function post(string $route, array $parameters = [])
     {
+        $this->tokenHandler();
+
         $url = $this->hostname . $route;
 
         $form_params = array_merge(
@@ -178,9 +300,12 @@ class AfpaConnect
      * @return string
      *
      * @throws GuzzleException
+     * @throws InvalidArgumentException
      */
     public function get(string $route, array $parameters = [])
     {
+        $this->tokenHandler();
+
         $url = $this->hostname . $route;
 
         $parameters = array_merge(

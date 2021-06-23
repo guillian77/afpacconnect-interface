@@ -8,37 +8,43 @@ require 'vendor/autoload.php';
  * Debug.
  * @param $toDebug
  */
-function dd($toDebug) {
+function debug($toDebug) {
     echo "<pre>";
     var_dump($toDebug);
     echo "</pre>";
 }
 
-session_start();
-
 $publicKey = file_get_contents("tests/afpanier.key");
 
-$ac = new AfpaConnect("http://localhost/AfpaConnect/", "afpanier", $publicKey);
+$api = new AfpaConnect();
+$api
+    ->setHostname("http://localhost/afpaconnect/")
+    ->setIssuer("afpanier")
+    ->setPublicKey($publicKey);
+
+debug($api->getHostname());
+debug($api->getIssuer());
+debug($api->getPublicKey());
 
 /**
  * POST EXAMPLE
  */
-$resp = $ac->post("register", [
+$resp = $api->post("register", [
     'username' => "123456789",
     'password' => "test"
 ]);
 
 $resp = json_decode($resp);
 
-dd($resp);
+debug($resp);
 
 /**
  * GET EXAMPLE
  */
-$resp = $ac->get("user", [
+$resp = $api->get("user", [
     'username' => "123456789"
 ]);
 
 $resp = json_decode($resp);
 
-dd($resp);
+debug($resp);
