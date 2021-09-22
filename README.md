@@ -4,6 +4,18 @@ Ce module permet d'intégrer facilement une classe permettant le dialogue avec l
 
 Packagist: [guillian/afpaconnect-interface](https://packagist.org/packages/guillian/afpaconnect-interface).
 ## Installation
+### Prérequis
+- php >= 7.4
+- composer >= 2.0
+- PHP7.4-curl
+- PHP7.4-json
+- PHP7.4-dom
+- PHP7.4-xml
+- PHP7.4-mbstring
+- PHP7.4-pdo
+- (PHP7.4-libxml)
+
+### Procédure
 ```SH
 composer require guillian/afpaconnect-interface
 ```
