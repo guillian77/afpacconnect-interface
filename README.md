@@ -7,6 +7,7 @@ Packagist: [guillian/afpaconnect-interface](https://packagist.org/packages/guill
 ### Prérequis
 - php >= 7.4
 - composer >= 2.0
+- PHP7.4-http
 - PHP7.4-curl
 - PHP7.4-json
 - PHP7.4-dom
