@@ -322,4 +322,21 @@ class AfpaConnect
 
         return $resp->getBody()->getContents();
     }
+
+    /**
+     * Get auth form from AfpaConnect API.
+     *
+     * @param array $configuration Configuration contain callback URLs.
+     *
+     * @return string
+     *
+     * @throws GuzzleException
+     * @throws InvalidArgumentException
+     */
+    public function getAuthTemplate(array $configuration): string
+    {
+        return $this->get('template/auth', [
+            'config' => $configuration
+        ]);
+    }
 }
